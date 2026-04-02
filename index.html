@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cookie Reader - ရိုးရိုး HTML/JavaScript</title>
+</head>
+<body>
+
+<h1>🍪 Chrome Cookie Reader</h1>
+<p>ဒီစာမျက်နှာက သင့် browser ထဲက cookie တွေကို ဖတ်ပြပေးပါမယ်</p>
+
+<hr>
+
+<h2>📋 သင်ရဲ့ Cookie များ</h2>
+
+<!-- Cookie တွေကို ဒီမှာပြမယ် -->
+<div id="cookieDisplay"></div>
+
+<hr>
+
+<!-- ခလုတ် ၃ ခု -->
+<button onclick="showAllCookies()">အားလုံးပြမယ်</button>
+<button onclick="searchCookie()">Cookie ရှာမယ်</button>
+<button onclick="clearDisplay()">ရှင်းမယ်</button>
+
+<br><br>
+
+<!-- ရှာဖွေရန် input box -->
+<div id="searchBox" style="display:none;">
+    <input type="text" id="cookieName" placeholder="Cookie နာမည်ထည့်ပါ (ဥပမာ - theme, language)">
+    <button onclick="showSpecificCookie()">ရှာမယ်</button>
+</div>
+
+<script>
+// ဒါက JavaScript code - cookie တွေကိုဖတ်မယ်
+
+// ပထမဆုံး စာမျက်နှာပေါ်လာတာနဲ့ cookie အားလုံးပြမယ်
+window.onload = function() {
+    showAllCookies();
+};
+
+// Cookie အားလုံးကို ပြမယ့် function
+function showAllCookies() {
+    let cookieString = document.cookie;
+    let displayDiv = document.getElementById("cookieDisplay");
+    
+    // cookie မရှိရင်
+    if (cookieString === "") {
+        displayDiv.innerHTML = "<p><b>⚠️ Cookie မတွေ့ပါ။ ဒီ website မှာ cookie မရှိသေးဘူး။</b></p>";
+        return;
+    }
+    
+    // Cookie တွေကို ခွဲထုတ်မယ်
+    let cookies = cookieString.split(';');
+    let output = "<table border='1' cellpadding='8' cellspacing='0'>";
+    output += "<tr bgcolor='#dddddd'><th>စဉ်</th><th>Cookie အမည်</th><th>တန်ဖိုး</th></tr>";
+    
+    for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i].trim();
+        let equalPos = cookie.indexOf('=');
+        
+        if (equalPos > 0) {
+            let name = cookie.substring(0, equalPos);
+            let value = cookie.substring(equalPos + 1);
+            
+            // URL encoded ဖြစ်နေရင် ပြန်ဖော်မယ်
+            try {
+                value = decodeURIComponent(value);
+            } catch(e) {
+                // မဖြစ်ရင်လည်း ရတယ်
+            }
+            
+            output += "<tr>";
+            output += "<td>" + (i+1) + "</td>";
+            output += "<td><b>" + name + "</b></td>";
+            output += "<td>" + value + "</td>";
+            output += "</tr>";
+        }
+    }
+    
+    output += "</table>";
+    output += "<p><b>📊 စုစုပေါင်း Cookie အရေအတွက်: " + cookies.length + "</b></p>";
+    
+    displayDiv.innerHTML = output;
+}
+
+// Cookie ရှာဖွေရန် box ကိုပြမယ်
+function searchCookie() {
+    let searchBox = document.getElementById("searchBox");
+    if (searchBox.style.display === "none") {
+        searchBox.style.display = "block";
+    } else {
+        searchBox.style.display = "none";
+    }
+}
+
+// သတ်မှတ် cookie တစ်ခုကိုပြမယ်
+function showSpecificCookie() {
+    let cookieName = document.getElementById("cookieName").value.trim();
+    
+    if (cookieName === "") {
+        alert("Cookie နာမည်ထည့်ပါ။");
+        return;
+    }
+    
+    let cookieString = document.cookie;
+    let cookies = cookieString.split(';');
+    let found = false;
+    let foundValue = "";
+    
+    for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i].trim();
+        let equalPos = cookie.indexOf('=');
+        
+        if (equalPos > 0) {
+            let name = cookie.substring(0, equalPos);
+            let value = cookie.substring(equalPos + 1);
+            
+            if (name === cookieName) {
+                found = true;
+                try {
+                    foundValue = decodeURIComponent(value);
+                } catch(e) {
+                    foundValue = value;
+                }
+                break;
+            }
+        }
+    }
+    
+    let displayDiv = document.getElementById("cookieDisplay");
+    
+    if (found) {
+        displayDiv.innerHTML = "<h3>✅ တွေ့ရှိခဲ့ပါသည်</h3>" +
+                               "<p><b>Cookie အမည်:</b> " + cookieName + "</p>" +
+                               "<p><b>တန်ဖိုး:</b> " + foundValue + "</p>" +
+                               "<button onclick='showAllCookies()'>အားလုံးပြန်ပြမယ်</button>";
+    } else {
+        displayDiv.innerHTML = "<p><b>❌ '" + cookieName + "' ဆိုတဲ့ cookie မတွေ့ပါ။</b></p>" +
+                               "<button onclick='showAllCookies()'>အားလုံးပြန်ပြမယ်</button>";
+    }
+    
+    // search box ကိုပိတ်မယ်
+    document.getElementById("searchBox").style.display = "none";
+}
+
+// မျက်နှာပြင်ကိုရှင်းမယ်
+function clearDisplay() {
+    document.getElementById("cookieDisplay").innerHTML = "<i>ပြသချက်ကို ရှင်းလင်းပြီးပါပြီ။ 'အားလုံးပြမယ်' ကိုနှိပ်ပါ။</i>";
+}
+</script>
+
+<hr>
+
+<h3>📝 အချက်အလက်များ</h3>
+<ul>
+    <li><b>HttpOnly Cookie</b> တွေကို JavaScript နဲ့ ဖတ်လို့မရပါဘူး (လုံခြုံရေးအတွက်)</li>
+    <li>ဒီစာမျက်နှာက သင့် browser ထဲက cookie တွေကိုသာ ပြမှာပါ</li>
+    <li>Cookie တန်ဖိုးတွေကို ဘယ်နေရာမှ သိမ်းဆည်းခြင်း မရှိပါဘူး</li>
+</ul>
+
+</body>
+</html>
